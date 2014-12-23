@@ -1,0 +1,82 @@
+//convert touch x and y to a tile in a staggered iso map
+public Vector2 worldToTilePos(float touchx, float touchy) {
+
+		Vector2 tile = new Vector2();
+		// alignment tweak
+		// 0,0 now equals the top left point of the map
+		touchx -= 32;
+		touchy -= 48;
+
+		// reverse
+		// opengl uses a y up coordinate, screens/maps are y down
+		touchy *= -1;
+
+		double x = touchx;
+		double y = touchy;
+		double tileWidth = 64;
+		double tileHeight = 32;
+		double halfTileHeight = tileHeight / 2;
+		double ratio = tileHeight / tileWidth;
+
+		// Start with the coordinates of a grid-aligned tile
+		double tileX = Math.floor(x / tileWidth);
+		double tileY = Math.floor(y / tileHeight) * 2;
+		// Relative x and y position on the base square of the grid-aligned tile
+		double relX = x - tileX * tileWidth;
+		double relY = y - (tileY / 2) * tileHeight;
+		// Check whether the cursor is in any of the corners (neighboring tiles)
+		if (halfTileHeight - relX * ratio > relY) {
+
+			System.out.println("two");
+
+			tile.x = (float) (tileX - 1);
+			tile.y = (float) (tileY - 1);
+
+		} else if (-halfTileHeight + relX * ratio > relY) {
+
+			System.out.println("four");
+
+			tile.x = (float) tileX;
+			tile.y = (float) (tileY - 1);
+
+		} else if (halfTileHeight + relX * ratio < relY) {
+
+			System.out.println("six");
+
+			tile.x = (float) (tileX - 1);
+			tile.y = (float) (tileY + 1);
+
+		} else if (halfTileHeight * 3 - relX * ratio < relY) {
+
+			System.out.println("eight");
+
+			tile.x = (float) tileX;
+			tile.y = (float) (tileY + 1);
+
+		} else {
+			System.out.println("nine");
+
+			tile.x = (float) tileX;
+			tile.y = (float) tileY;
+		}
+
+		// System.out.println("Touch Y " + touchy);
+		// System.out.println("Touch X " + touchx);
+		System.out.println("Tile X " + tile.x);
+		System.out.println("Tile Y " + tile.y);
+		// System.out.println("Player x " + (myactor.getX()));
+		// System.out.println("Player y " + (myactor.getY()));
+		if (tile.x <0 || tile.y <0) {
+			tile = null;
+		}
+		return tile;
+
+	}
+//set pixel x and y based on tilex and tiley
+public void setPosByTile(int tilex, int tiley) {
+
+		int tempx = (tilex * 64) + (32 * (tiley % 2));
+		int tempy = -((tiley / 2) * 32) + ((tiley % 2) * -TILE_HEIGHT_HALF);
+		setX(tempx);
+		setY(tempy);
+	}
